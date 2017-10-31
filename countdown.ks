@@ -1,0 +1,38 @@
+CLEARSCREEN.
+
+LOCK THROTTLE to 1.0.
+
+
+PRINT "==STARTING COUNTDOWN==".
+FROM {local countdown is 10.} UNTIL countdown = 0 STEP {SET countdown to countdown - 1.} DO{
+   PRINT "..."+countdown.
+   WAIT 1.
+}
+
+
+WHEN STAGE:LIQUIDFUEL < 0.1 THEN {
+   PRINT "==STAGING==".
+   STAGE.
+   PRESERVE.
+}
+
+LOCK THROTTLE TO 1.
+LOCK STEERING TO R(0,0,-90) + HEADING(90,90).
+STAGE.
+WAIT UNTIL SHIP:ALTITUDE > 1000.
+
+SET g TO KERBIN:MU / KERBIN:RADIUS^2.
+LOCK accvec TO SHIP:SENSORS:ACC - SHIP:SENSORS:GRAV.
+LOCK gforce TO accvec:MAG / g.
+LOCK dthrott TO 0.05 * (1.2 - gforce).
+
+SET thrott TO 1.
+LOCK THROTTLE TO thrott.
+
+UNTIL SHIP:ALTITUDE > 40000 {
+   SET thrott TO thrott + dthrott.
+   WAIT 0.1.
+}
+
+UNLOCK STEERING.
+SET SHIP:CONTROL:PILOTMAINTHROTTLE TO 0.
